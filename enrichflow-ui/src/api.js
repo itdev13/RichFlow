@@ -1,4 +1,4 @@
-const BASE = import.meta.env.VITE_API_URL || '';
+const BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
 async function request(path, { method = 'GET', body, params } = {}) {
   const url = new URL(`${BASE}${path}`, window.location.origin);
