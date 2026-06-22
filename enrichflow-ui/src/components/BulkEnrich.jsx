@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 
 export default function BulkEnrich({ locationId, connected, subBlocked }) {
@@ -58,7 +58,7 @@ export default function BulkEnrich({ locationId, connected, subBlocked }) {
   if (!connected) {
     return (
       <div className="card">
-        <h2>Bulk enrich</h2>
+        <h2>Bulk Enrich</h2>
         <p className="empty">Connect this account to your CRM to list and enrich contacts in bulk.</p>
       </div>
     );
@@ -66,7 +66,7 @@ export default function BulkEnrich({ locationId, connected, subBlocked }) {
 
   return (
     <div className="card">
-      <h2>Bulk enrich</h2>
+      <h2>Bulk Enrich</h2>
       <p className="sub">Select contacts and enrich them in one pass. Each enriched contact is written back and charged.</p>
 
       <div className="btn-row" style={{ marginBottom: 14 }}>
@@ -108,7 +108,7 @@ export default function BulkEnrich({ locationId, connected, subBlocked }) {
               <th>Name</th>
               <th>Email</th>
               <th>Company</th>
-              <th className="tiny">Status</th>
+              <th className="tiny">Result</th>
             </tr>
           </thead>
           <tbody>
@@ -132,6 +132,6 @@ function StatusTag({ status }) {
   if (!status) return <span className="muted">—</span>;
   if (status === 'running') return <span className="spinner" style={{ borderTopColor: 'var(--primary)', borderColor: '#ddd' }} />;
   if (status === 'matched') return <span className="tag green">enriched</span>;
-  if (status === 'no_match') return <span className="tag gray">no match</span>;
+  if (status === 'no_match') return <span className="tag gray">No match</span>;
   return <span className="tag gray" style={{ color: 'var(--red)' }}>error</span>;
 }

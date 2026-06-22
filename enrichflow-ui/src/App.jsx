@@ -38,8 +38,8 @@ function requestSsoUserData(timeoutMs = 4000) {
 }
 
 const TABS = [
-  { id: 'single', label: 'Enrich a contact' },
-  { id: 'bulk', label: 'Bulk enrich' },
+  { id: 'single', label: 'Enrich a Contact' },
+  { id: 'bulk', label: 'Bulk Enrich' },
   { id: 'usage', label: 'Usage' }
 ];
 

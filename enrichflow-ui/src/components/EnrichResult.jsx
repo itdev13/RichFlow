@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment } from 'react';
 
 const FIELD_LABELS = {
   workEmail: 'Work email',
@@ -36,10 +36,10 @@ export default function EnrichResult({ result }) {
 
       <div className="kv">
         {Object.entries(data).map(([k, v]) => (
-          <React.Fragment key={k}>
+          <Fragment key={k}>
             <span className="k">{FIELD_LABELS[k] || k}</span>
             <span className="v">{renderValue(k, v)}</span>
-          </React.Fragment>
+          </Fragment>
         ))}
       </div>
 

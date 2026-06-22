@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { api } from '../api.js';
 import EnrichResult from './EnrichResult.jsx';
 
@@ -35,8 +35,8 @@ export default function SingleEnrich({ locationId, connected, subBlocked }) {
 
   return (
     <div className="card">
-      <h2>Enrich a contact</h2>
-      <p className="sub">Preview runs against the mock/provider waterfall with no charge. Enriching a CRM contact writes fields back and charges credits.</p>
+      <h2>Enrich a Contact</h2>
+      <p className="sub">Preview runs with no charge. Enriching a CRM contact writes fields back and charges credits.</p>
 
       <div className="tabs" style={{ marginBottom: 16 }}>
         <button className={mode === 'details' ? 'active' : ''} onClick={() => setMode('details')}>By details</button>
@@ -74,7 +74,7 @@ export default function SingleEnrich({ locationId, connected, subBlocked }) {
               {busy === 'preview' ? <span className="spinner" /> : 'Preview (no charge)'}
             </button>
             <button className="btn" disabled={!!busy || subBlocked} onClick={() => run('enrich')}>
-              {busy === 'enrich' ? <span className="spinner" /> : 'Enrich'}
+              {busy === 'enrich' ? <span className="spinner" /> : 'Enrich Contact'}
             </button>
           </div>
         </>
@@ -88,7 +88,7 @@ export default function SingleEnrich({ locationId, connected, subBlocked }) {
           {subBlocked && <p className="muted" style={{ fontSize: 12 }}>An active subscription is required to enrich.</p>}
           <div className="btn-row">
             <button className="btn" disabled={!!busy || !connected || !contactId.trim() || subBlocked} onClick={() => run('enrich')}>
-              {busy === 'enrich' ? <span className="spinner" /> : 'Enrich & write back'}
+              {busy === 'enrich' ? <span className="spinner" /> : 'Enrich & Write Back'}
             </button>
           </div>
         </>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 
 export default function UsageDashboard({ locationId, sub }) {
@@ -36,14 +36,14 @@ export default function UsageDashboard({ locationId, sub }) {
 
 
       <div className="stats" style={{ marginBottom: 16 }}>
-        <Stat label="Total runs" value={s.totalRuns ?? 0} />
+        <Stat label="Total Runs" value={s.totalRuns ?? 0} />
         <Stat label="Matched" value={s.matched ?? 0} />
-        <Stat label="Credits used" value={s.creditsUsed ?? 0} />
-        <Stat label="Est. spend" value={`$${(s.estSpendUsd ?? 0).toFixed(2)}`} />
+        <Stat label="Credits Used" value={s.creditsUsed ?? 0} />
+        <Stat label="Est. Spend" value={`$${(s.estSpendUsd ?? 0).toFixed(2)}`} />
       </div>
 
       <div className="card">
-        <h2>Recent enrichments</h2>
+        <h2>Recent Enrichments</h2>
         <p className="sub">Last 10 runs for this account.</p>
         {recent.length === 0 ? (
           <p className="empty">No enrichments yet.</p>
@@ -54,8 +54,8 @@ export default function UsageDashboard({ locationId, sub }) {
                 <th>Contact</th>
                 <th className="tiny">Result</th>
                 <th className="tiny">Credits</th>
-                <th className="tiny">Written</th>
-                <th className="tiny">When</th>
+                <th className="tiny">Written to CRM</th>
+                <th className="tiny">Date</th>
               </tr>
             </thead>
             <tbody>
@@ -67,7 +67,7 @@ export default function UsageDashboard({ locationId, sub }) {
                       <span style={{ color: 'var(--muted)', fontSize: 11.5, marginLeft: 6 }}>{r.contactEmail}</span>
                     )}
                   </td>
-                  <td className="tiny">{r.matched ? <span className="tag green">matched</span> : <span className="tag gray">no match</span>}</td>
+                  <td className="tiny">{r.matched ? <span className="tag green">Matched</span> : <span className="tag gray">No match</span>}</td>
                   <td className="tiny">{r.credits}</td>
                   <td className="tiny">{r.writtenToGhl ? <span className="tag green">yes</span> : <span style={{ color: 'var(--muted)' }}>—</span>}</td>
                   <td className="tiny muted">{new Date(r.createdAt).toLocaleString()}</td>
