@@ -3,8 +3,12 @@ const router = express.Router();
 const Installation = require('../models/Installation');
 const OAuthToken = require('../models/OAuthToken');
 const subscriptionService = require('../services/subscriptionService');
+const ghlService = require('../services/ghlService');
 const database = require('../config/database');
 const logger = require('../utils/logger');
+const ThrottleQueue = require('../utils/throttleQueue');
+
+const tokenGenQueue = new ThrottleQueue({ name: 'proactive-token-gen', delayMs: 350 });
 
 /**
  * GHL app lifecycle webhooks (POST to /api/webhooks/enrichflow).
@@ -62,6 +66,43 @@ router.post('/enrichflow', async (req, res) => {
           raw: data
         });
         logger.info('✅ App installed — subscription activated', { locationId, planId: data.planId });
+
+        // Proactively mint a location token from the company token so the UI
+        // shows "Connected" immediately without waiting for a manual API call.
+        if (locationId && companyId) {
+          tokenGenQueue.push(async () => {
+            try {
+              const existing = await OAuthToken.findOne({ locationId, tokenType: 'location', isActive: true });
+              if (existing) {
+                logger.info('ℹ️ Location token already exists', { locationId });
+                return;
+              }
+              const companyToken = await OAuthToken.findOne({ companyId, tokenType: 'company', isActive: true });
+              if (!companyToken) {
+                logger.warn('⚠️ No company token found — skipping location token generation', { locationId });
+                return;
+              }
+              logger.info('🔄 Generating location token from company token', { locationId, queueSize: tokenGenQueue.size() });
+              const minted = await ghlService.getLocationTokenFromCompany(companyId, locationId);
+              await OAuthToken.findOneAndUpdate(
+                { locationId, tokenType: 'location' },
+                {
+                  locationId,
+                  companyId,
+                  tokenType: 'location',
+                  accessToken: minted.accessToken,
+                  refreshToken: minted.refreshToken,
+                  expiresAt: new Date(Date.now() + minted.expiresIn * 1000),
+                  isActive: true
+                },
+                { upsert: true, new: true }
+              );
+              logger.info('✅ Location token stored', { locationId });
+            } catch (e) {
+              logger.error('⚠️ Failed to generate location token (non-critical)', { locationId, message: e.message });
+            }
+          });
+        }
         break;
       }
 
