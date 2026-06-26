@@ -39,7 +39,7 @@ class PDLProvider extends BaseProvider {
       throw err;
     }
 
-    const params = { min_likelihood: 6 };
+    const params = { min_likelihood: 2 };
     if (input.email) params.email = input.email;
     if (input.phone) params.phone = input.phone; // reverse phone lookup
     if (input.fullName) params.name = input.fullName;
@@ -53,7 +53,7 @@ class PDLProvider extends BaseProvider {
         headers: { 'X-Api-Key': this.apiKey },
         timeout: 15000
       });
-      logger.info('PDL response', { status: res.status, likelihood: res.data?.likelihood });
+      logger.info('PDL response', { status: res.status, likelihood: res.data?.likelihood, matchFound: !!res.data?.data });
     } catch (error) {
       logger.warn('PDL request failed', {
         status: error.response?.status,
