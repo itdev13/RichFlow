@@ -71,25 +71,11 @@ async function runEnrichment(opts = {}) {
   // Billing: monthly plan covers "included" credits first; only the overage hits the wallet.
   const subStatus = locationId ? await subscriptionService.getStatus(locationId) : null;
   const overageRateUsd = subStatus?.plan?.overageRateUsd ?? null;
+  const planId = subStatus?.planId || null;
+  const planName = subStatus?.plan?.name || null;
   let billing = { charged: false, amount: billingService.priceFor(result.credits, overageRateUsd), credits: result.credits };
-  if (locationId && result.credits > 0) {
-    const { coveredByPlan, overage } = await subscriptionService.consumeIncluded(locationId, result.credits);
-    if (overage > 0) {
-      const wallet = await chargeForRun({ locationId, credits: overage, contactId, overageRateUsd });
-      billing = { ...wallet, credits: result.credits, coveredByPlan, overageCredits: overage };
-    } else {
-      billing = {
-        charged: false,
-        credits: result.credits,
-        coveredByPlan,
-        overageCredits: 0,
-        amount: 0,
-        skipped: 'covered_by_plan'
-      };
-    }
-  }
 
-  // Persist audit record.
+  // Persist audit record first so we have an ID to link to the billing transaction.
   let recordId = null;
   if (database.isConnected()) {
     const EnrichmentRecord = require('../models/EnrichmentRecord');
@@ -108,15 +94,37 @@ async function runEnrichment(opts = {}) {
       fieldsFound: result.fieldsFound,
       attempts: result.attempts,
       writtenToGhl,
-      charged: billing.charged
+      charged: false // updated below if wallet charge succeeds
     });
     recordId = doc._id;
+  }
+
+  if (locationId && result.credits > 0) {
+    const { coveredByPlan, overage } = await subscriptionService.consumeIncluded(locationId, result.credits);
+    if (overage > 0) {
+      const wallet = await chargeForRun({ locationId, credits: overage, contactId, overageRateUsd, planId, planName, enrichmentRecordId: recordId });
+      billing = { ...wallet, credits: result.credits, coveredByPlan, overageCredits: overage };
+      // update the enrichment record with final charged state
+      if (recordId && database.isConnected()) {
+        const EnrichmentRecord = require('../models/EnrichmentRecord');
+        await EnrichmentRecord.findByIdAndUpdate(recordId, { charged: billing.charged });
+      }
+    } else {
+      billing = {
+        charged: false,
+        credits: result.credits,
+        coveredByPlan,
+        overageCredits: 0,
+        amount: 0,
+        skipped: 'covered_by_plan'
+      };
+    }
   }
 
   return { recordId, writtenToGhl, billing, ...result };
 }
 
-async function chargeForRun({ locationId, credits, contactId, overageRateUsd }) {
+async function chargeForRun({ locationId, credits, contactId, overageRateUsd, planId, planName, enrichmentRecordId }) {
   const fallback = { charged: false, amount: billingService.priceFor(credits, overageRateUsd), credits };
   if (!database.isConnected()) return { ...fallback, skipped: 'no_database' };
   try {
@@ -133,6 +141,9 @@ async function chargeForRun({ locationId, credits, contactId, overageRateUsd }) 
       accessToken,
       credits,
       overageRateUsd,
+      planId,
+      planName,
+      enrichmentRecordId,
       eventId: `${contactId || 'manual'}_${Date.now()}`,
       description: `EnrichFlow enrichment (${credits} credits)`
     });

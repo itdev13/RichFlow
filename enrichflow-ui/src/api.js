@@ -21,6 +21,7 @@ export const api = {
   status: (locationId) => request('/oauth/status', { params: { locationId } }),
   subscription: (locationId) => request('/api/subscription/status', { params: { locationId } }),
   usage: (locationId) => request('/api/analytics/usage', { params: { locationId } }),
+  transactions: (locationId, limit = 20) => request('/api/subscription/transactions', { params: { locationId, limit } }),
   contacts: (params) => request('/api/contacts', { params }),
   preview: (input, providers) => request('/api/enrich/preview', { method: 'POST', body: { input, ...providers } }),
   enrich: (body) => request('/api/enrich', { method: 'POST', body }),

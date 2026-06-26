@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const subscriptionService = require('../services/subscriptionService');
+const BillingTransaction = require('../models/BillingTransaction');
 const logger = require('../utils/logger');
 
 /**
@@ -15,6 +16,23 @@ router.get('/status', async (req, res) => {
     return res.json({ success: true, ...status });
   } catch (err) {
     logger.error('Subscription status failed', { message: err.message });
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * GET /api/subscription/transactions?locationId=...&limit=20
+ * Billing transaction history for the Usage dashboard.
+ */
+router.get('/transactions', async (req, res) => {
+  const { locationId, limit = 20 } = req.query;
+  if (!locationId) return res.status(400).json({ success: false, error: 'locationId is required' });
+  try {
+    const transactions = await BillingTransaction.getRecent(locationId, Number(limit));
+    const monthly = await BillingTransaction.getMonthlySpend(locationId);
+    return res.json({ success: true, transactions, monthlySpend: monthly });
+  } catch (err) {
+    logger.error('Transactions fetch failed', { message: err.message });
     return res.status(500).json({ success: false, error: err.message });
   }
 });

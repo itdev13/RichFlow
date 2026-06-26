@@ -1,5 +1,6 @@
 const axios = require('axios');
 const logger = require('../utils/logger');
+const BillingTransaction = require('../models/BillingTransaction');
 
 /**
  * Billing — converts enrichment CREDITS into a GoHighLevel Marketplace wallet charge.
@@ -44,22 +45,25 @@ class BillingService {
   }
 
   /**
-   * Charge the wallet for an enrichment run.
+   * Charge the wallet for an enrichment run and record the transaction.
    * @returns {{ charged: boolean, amount: number, credits: number, chargeId?: string, skipped?: string }}
    */
-  async chargeCredits({ companyId, locationId, accessToken, credits, eventId, description, overageRateUsd }) {
+  async chargeCredits({ companyId, locationId, accessToken, credits, eventId, description, overageRateUsd, enrichmentRecordId, type, planId, planName }) {
     const rate = overageRateUsd ?? DEFAULT_CREDIT_PRICE_USD;
     const amount = this.priceFor(credits, rate);
+    const desc = description || `EnrichFlow enrichment (${credits} credits)`;
 
     if (credits <= 0) return { charged: false, amount: 0, credits, skipped: 'zero_credits' };
 
     if (!this.isEnabled()) {
       logger.info('Billing disabled — skipping charge', { credits, amount, locationId });
+      await this._recordTransaction({ locationId, companyId, type, credits, rateUsd: rate, amountUsd: amount, planId, planName, status: 'billing_disabled', description: desc, enrichmentRecordId });
       return { charged: false, amount, credits, skipped: 'billing_disabled' };
     }
 
     if (!METER_ID || !APP_ID) {
       logger.warn('Billing enabled but GHL_METER_ID / GHL_APP_ID not set — skipping charge');
+      await this._recordTransaction({ locationId, companyId, type, credits, rateUsd: rate, amountUsd: amount, planId, planName, status: 'skipped', description: desc, enrichmentRecordId });
       return { charged: false, amount, credits, skipped: 'meter_not_configured' };
     }
 
@@ -74,17 +78,39 @@ class BillingService {
           appId: APP_ID,
           eventId,
           locationId,
-          description: description || `EnrichFlow enrichment (${credits} credits)`
+          description: desc
         },
         { headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json', Version: '2021-07-28' } }
       );
 
       const chargeId = data.chargeId || data.id || data._id;
       logger.info('✅ Wallet charged', { credits, amount, chargeId, locationId });
+      await this._recordTransaction({ locationId, companyId, type, credits, rateUsd: rate, amountUsd: amount, ghlChargeId: chargeId, planId, planName, status: 'charged', description: desc, enrichmentRecordId });
       return { charged: true, amount, credits, chargeId };
     } catch (error) {
+      const msg = error.response?.data?.message || error.message;
       logger.error('Wallet charge failed', { message: error.response?.data || error.message });
-      throw new Error(error.response?.data?.message || 'Payment failed. Check wallet balance.');
+      await this._recordTransaction({ locationId, companyId, type, credits, rateUsd: rate, amountUsd: amount, planId, planName, status: 'failed', errorMessage: msg, description: desc, enrichmentRecordId });
+      throw new Error(msg || 'Payment failed. Check wallet balance.');
+    }
+  }
+
+  async _recordTransaction({ locationId, companyId, type, credits, rateUsd, amountUsd, ghlChargeId, planId, planName, status, errorMessage, description, enrichmentRecordId }) {
+    try {
+      await BillingTransaction.create({
+        locationId, companyId,
+        type: type || 'enrichment_overage',
+        credits, rateUsd, amountUsd,
+        ghlChargeId: ghlChargeId || null,
+        planId: planId || null,
+        planName: planName || null,
+        status,
+        errorMessage: errorMessage || null,
+        description,
+        enrichmentRecordId: enrichmentRecordId || null
+      });
+    } catch (e) {
+      logger.warn('Failed to record billing transaction (non-fatal)', { message: e.message });
     }
   }
 }
