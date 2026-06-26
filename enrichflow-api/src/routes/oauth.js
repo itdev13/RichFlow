@@ -19,21 +19,21 @@ function connectedPage() {
   * { box-sizing: border-box; }
   body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
          background:linear-gradient(135deg,#f5f3ff 0%,#ffffff 60%); color:var(--ink);
-         min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
-  .card { width:100%; max-width:440px; background:#fff; border:1px solid var(--line); border-radius:18px;
-          box-shadow:0 18px 50px rgba(109,40,217,.12); padding:34px 30px; text-align:center; }
-  .badge { width:62px; height:62px; margin:0 auto 18px; border-radius:50%;
+         min-height:100vh; display:flex; align-items:center; justify-content:center; padding:32px 24px; }
+  .card { width:100%; max-width:620px; background:#fff; border:1px solid var(--line); border-radius:22px;
+          box-shadow:0 18px 60px rgba(109,40,217,.12); padding:52px 52px 44px; text-align:center; }
+  .badge { width:72px; height:72px; margin:0 auto 24px; border-radius:50%;
            background:linear-gradient(135deg,var(--brand),var(--brand2)); display:flex; align-items:center;
-           justify-content:center; color:#fff; font-size:30px; box-shadow:0 8px 20px rgba(109,40,217,.35); }
-  h1 { margin:0 0 6px; font-size:22px; }
-  .sub { margin:0 0 22px; color:var(--muted); font-size:14px; line-height:1.5; }
-  .what { text-align:left; background:#faf8ff; border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin:0 0 20px; }
-  .what li { margin:7px 0; font-size:13.5px; color:#3f3a52; }
-  .next { display:flex; gap:10px; align-items:flex-start; text-align:left; background:#f3effe;
-          border-radius:12px; padding:14px 16px; font-size:13.5px; line-height:1.5; }
+           justify-content:center; color:#fff; font-size:34px; box-shadow:0 8px 24px rgba(109,40,217,.35); }
+  h1 { margin:0 0 10px; font-size:26px; }
+  .sub { margin:0 auto 28px; color:var(--muted); font-size:15px; line-height:1.6; max-width:460px; }
+  .what { text-align:left; background:#faf8ff; border:1px solid var(--line); border-radius:14px; padding:20px 24px; margin:0 0 20px; }
+  .what li { margin:10px 0; font-size:14.5px; color:#3f3a52; line-height:1.5; }
+  .next { display:flex; gap:14px; align-items:flex-start; text-align:left; background:#f3effe;
+          border-radius:14px; padding:18px 22px; font-size:14.5px; line-height:1.6; }
   .next b { color:var(--brand); }
-  .pin { font-size:18px; line-height:1.2; }
-  .foot { margin-top:22px; font-size:12px; color:#a8a3b8; }
+  .pin { font-size:20px; line-height:1.2; flex-shrink:0; margin-top:2px; }
+  .foot { margin-top:28px; font-size:12.5px; color:#a8a3b8; }
 </style>
 </head>
 <body>
@@ -48,6 +48,59 @@ function connectedPage() {
       <li>&#129518; Automate it inside any workflow with the <b>Enrich Contact</b> action</li>
       <li>&#128202; Track usage, matches &amp; credits from the dashboard</li>
     </ul>
+
+    <div class="next">
+      <span class="pin">&#128205;</span>
+      <span>Open the <b>Contact Enrichment</b> tab in your left menu to start enriching contacts. You can close this window now.</span>
+    </div>
+
+    <div class="foot">EnrichFlow &middot; Contact data enrichment</div>
+  </div>
+</body>
+</html>`;
+}
+
+/** Page shown when the OAuth code was already used (e.g. user refreshed the callback URL). */
+function alreadyConnectedPage() {
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EnrichFlow — Already Connected</title>
+<style>
+  :root { --brand:#6d28d9; --brand2:#9333ea; --ink:#1e1b2e; --muted:#6b7280; --line:#ece9f5; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+         background:linear-gradient(135deg,#f5f3ff 0%,#ffffff 60%); color:var(--ink);
+         min-height:100vh; display:flex; align-items:center; justify-content:center; padding:32px 24px; }
+  .card { width:100%; max-width:620px; background:#fff; border:1px solid var(--line); border-radius:22px;
+          box-shadow:0 18px 60px rgba(109,40,217,.12); padding:52px 52px 44px; text-align:center; }
+  .badge { width:72px; height:72px; margin:0 auto 24px; border-radius:50%;
+           background:linear-gradient(135deg,#059669,#10b981); display:flex; align-items:center;
+           justify-content:center; color:#fff; font-size:34px; box-shadow:0 8px 24px rgba(5,150,105,.3); }
+  h1 { margin:0 0 10px; font-size:26px; }
+  .sub { margin:0 auto 28px; color:var(--muted); font-size:15px; line-height:1.6; max-width:460px; }
+  .info { display:flex; gap:14px; align-items:flex-start; text-align:left; background:#f0fdf4;
+          border:1px solid #bbf7d0; border-radius:14px; padding:18px 22px; font-size:14.5px; line-height:1.6; margin-bottom:20px; }
+  .info-icon { font-size:22px; flex-shrink:0; margin-top:2px; }
+  .next { display:flex; gap:14px; align-items:flex-start; text-align:left; background:#f3effe;
+          border-radius:14px; padding:18px 22px; font-size:14.5px; line-height:1.6; }
+  .next b { color:var(--brand); }
+  .pin { font-size:20px; line-height:1.2; flex-shrink:0; margin-top:2px; }
+  .foot { margin-top:28px; font-size:12.5px; color:#a8a3b8; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">&#10003;</div>
+    <h1>Already Connected</h1>
+    <p class="sub">EnrichFlow is already installed and active on this account. No action needed.</p>
+
+    <div class="info">
+      <span class="info-icon">&#128161;</span>
+      <span>This page was likely opened by refreshing the browser after a completed install. The authorization link is single-use — your account is already linked and ready to use.</span>
+    </div>
 
     <div class="next">
       <span class="pin">&#128205;</span>
@@ -108,8 +161,19 @@ router.get('/callback', async (req, res) => {
 
     return res.send(connectedPage());
   } catch (err) {
-    logger.error('OAuth callback failed', { message: err.response?.data || err.message });
-    return res.status(500).send('Failed to complete OAuth. Check server logs.');
+    const detail = err.response?.data
+      ? JSON.stringify(err.response.data)
+      : err.message || String(err);
+    logger.error('OAuth callback failed', { detail });
+
+    // GHL codes are single-use — refreshing the callback URL causes "code already used".
+    // Detect this and show a friendly "already connected" page instead of a 500.
+    const msg = detail.toLowerCase();
+    if (msg.includes('already') || msg.includes('invalid_grant') || msg.includes('code') || msg.includes('expired')) {
+      return res.send(alreadyConnectedPage());
+    }
+
+    return res.status(500).send(`OAuth failed: ${detail}`);
   }
 });
 
