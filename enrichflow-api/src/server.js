@@ -48,7 +48,8 @@ class EnrichFlowApp {
           origin.includes('ngrok') ||
           origin.includes('localhost') ||
           origin.includes('127.0.0.1') ||
-          origin.includes('vercel.app');
+          origin.includes('vercel.app') ||
+          origin.includes('vaultsuite.store');
         return trusted ? callback(null, true) : callback(new Error('Not allowed by CORS'));
       },
       credentials: true

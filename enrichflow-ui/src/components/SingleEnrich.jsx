@@ -39,7 +39,7 @@ export default function SingleEnrich({ locationId, connected, subBlocked }) {
       <p className="sub">Preview runs with no charge. Enriching a CRM contact writes fields back and charges credits.</p>
 
       <div className="tabs" style={{ marginBottom: 16 }}>
-        <button className={mode === 'details' ? 'active' : ''} onClick={() => setMode('details')}>By details</button>
+        <button className={mode === 'details' ? 'active' : ''} onClick={() => setMode('details')}>By Details</button>
         <button className={mode === 'contact' ? 'active' : ''} onClick={() => setMode('contact')}>By Contact ID</button>
       </div>
 
@@ -57,7 +57,7 @@ export default function SingleEnrich({ locationId, connected, subBlocked }) {
           </div>
           <div className="row">
             <div className="field">
-              <label>Full name</label>
+              <label>Full Name</label>
               <input value={form.fullName} onChange={set('fullName')} placeholder="Jane Doe" />
             </div>
             <div className="field">
@@ -66,7 +66,7 @@ export default function SingleEnrich({ locationId, connected, subBlocked }) {
             </div>
           </div>
           <div className="field">
-            <label>Company domain</label>
+            <label>Company Domain</label>
             <input value={form.companyDomain} onChange={set('companyDomain')} placeholder="acme.io" />
           </div>
           <div className="btn-row">
